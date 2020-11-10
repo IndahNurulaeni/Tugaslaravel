@@ -1,9 +1,7 @@
 <?php
 
-
 namespace App\Http\Controllers;
 use App\Models\Friends;
-
 use Illuminate\Http\Request;
 
 class cobaController extends Controller

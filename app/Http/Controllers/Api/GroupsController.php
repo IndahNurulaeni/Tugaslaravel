@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 Use App\Models\Groups;
 Use App\Models\Friends;
@@ -17,7 +17,11 @@ class GroupsController extends Controller
     {
         $groups = Groups::orderBy('id','desc')->paginate(3);
     
-        return view ('groups.index', compact('groups'));
+        return response()->json([
+            'success' =>true,
+            'message' =>'Daftar data teman',
+            'data' => $groups
+        ],200);
     }
 
     /**
@@ -27,7 +31,7 @@ class GroupsController extends Controller
      */
     public function create()
     {
-        return view ('groups.create');
+        
     }
 
     /**
@@ -42,15 +46,25 @@ class GroupsController extends Controller
             'name' => 'required|unique:groups|max:255',
             'description' => 'required',
         ]);
-   
-           $groups = new groups;
-   
-           $groups->name = $request->name;
-           $groups->description = $request->description;
-   
-           $groups->save();
-   
-           return redirect('/groups');
+        $groups = Groups::create([
+            'nama' => $request ->name,
+            'description' => $request ->description
+        ]);
+
+        if($groups)
+        {
+            return response()->json([
+            'success' =>true,
+            'message' =>'Teman berhasil di tambahkan',
+            'data' => $groups
+        ],200);
+        }else{
+            return response()->json([
+                'success' =>false,
+                'message' =>'Teman gagal di tambahkan',
+                'data' => $groups
+            ],409);
+        }
     }
 
     /**
@@ -62,7 +76,12 @@ class GroupsController extends Controller
     public function show($id)
     {
         $group = Groups::where('id',$id)->first();
-      return view('groups.show', ['group' => $group]);
+
+        return response()->json([
+            'success' =>true,
+            'message' =>'Detail Data Teman',
+            'data' => $group
+        ],200);
     }
 
     /**
@@ -73,8 +92,7 @@ class GroupsController extends Controller
      */
     public function edit($id)
     {
-        $group = Groups::where('id',$id)->first();
-      return view('groups.edit', ['group' => $group]);
+
     }
 
     /**
@@ -86,12 +104,15 @@ class GroupsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'nama' => 'required|unique:friends|max:225',
+            'description' => 'required'
+        ]);
+
         Groups::find($id)->update([
             'name' => $request->name,
             'description' => $request->description
          ]);
-   
-         return redirect ('/groups');
     }
 
     /**

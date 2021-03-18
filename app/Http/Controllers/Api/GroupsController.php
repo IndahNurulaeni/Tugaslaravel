@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
-Use App\Models\Groups;
-Use App\Models\Friends;
+use App\Models\Groups;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class GroupsController extends Controller
@@ -75,12 +74,12 @@ class GroupsController extends Controller
      */
     public function show($id)
     {
-        $group = Groups::where('id',$id)->first();
+        $groups = Groups::where('id',$id)->first();
 
         return response()->json([
             'success' =>true,
             'message' =>'Detail Data Teman',
-            'data' => $group
+            'data' => $groups
         ],200);
     }
 
@@ -104,15 +103,16 @@ class GroupsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $groups = Groups::find($id)->update([
             'nama' => 'required|unique:friends|max:225',
             'description' => 'required'
         ]);
 
-        Groups::find($id)->update([
-            'name' => $request->name,
-            'description' => $request->description
-         ]);
+        return response()->json([
+            'success' =>true,
+            'message' =>'Data berhasil di rubah',
+            'data' => $groups
+        ],200);
     }
 
     /**
@@ -123,34 +123,12 @@ class GroupsController extends Controller
      */
     public function destroy($id)
     {
-        Groups::find($id)->delete();
-        return redirect ('/groups');
-    }
+        $group = Groups::find($id)->delete();
 
-    public function addmember($id)
-    {
-        $friend = Friends::where('groups_id', '=', 0)->get();
-        $group = Groups::where('id',$id)->first();
-      return view('groups.addmember', ['group' => $group,'friend'=> $friend]);
-    }
-
-    public function updateaddmember(Request $request, $id)
-    {
-        $friend = Friends::where('id',$request->friend_id)->first();
-        Friends::find($friend->id)->update([
-            'groups_id' => $id
-         ]);
-   
-         return redirect ('/groups/addmember/'. $id);
-    }
-
-    public function deleteaddmember(Request $request, $id)
-    {
-        //dd($id);
-        Friends::find($id)->update([
-            'groups_id' => 0
-         ]);
-   
-         return redirect ('/groups');
+        return response()->json([
+            'success' =>true,
+            'message' =>'Data teman berhasil di hapus',
+            'data' => $group
+        ],200);
     }
 }

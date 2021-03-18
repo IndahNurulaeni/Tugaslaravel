@@ -73,7 +73,7 @@ class CobaController extends Controller
         return response()->json([
             'success' =>true,
             'message' =>'Detail Data Teman',
-            'data' => $friends
+            'data' => $friend
         ],200);
     }
 
@@ -86,13 +86,7 @@ class CobaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama' => 'required|unique:friends|max:225',
-            'no_tlp' =>'required|numeric',
-            'alamat' =>'required',
-        ]);
-
-       $f = Friends::find($id)->update([
+       $friend = Friends::find($id)->update([
             'nama' => $request->nama,
             'no_tlp' => $request->no_tlp,
             'alamat' => $request->alamat
@@ -100,8 +94,8 @@ class CobaController extends Controller
 
         return response()->json([
             'success' =>true,
-            'message' =>'Post Updated',
-            'data' => $f
+            'message' =>'Data teman berhasil di rubah',
+            'data' => $friend
         ],200);
     }
 
@@ -113,12 +107,12 @@ class CobaController extends Controller
      */
     public function destroy($id)
     {
-        $cek = Friends::find($id)->delete();
+        $friend = Friends::find($id)->delete();
 
         return response()->json([
             'success' =>true,
-            'message' =>'Post Updated',
-            'data' => $cek
+            'message' =>'Data teman berhasil di hapus',
+            'data' => $friend
         ],200);
     }
 }

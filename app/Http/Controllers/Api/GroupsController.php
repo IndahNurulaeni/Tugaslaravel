@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use App\Models\Groups;
+
+Use App\Models\Groups;
+Use App\Models\Friends;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -14,23 +16,13 @@ class GroupsController extends Controller
      */
     public function index()
     {
-        $groups = Groups::orderBy('id','desc')->paginate(3);
-    
-        return response()->json([
-            'success' =>true,
-            'message' =>'Daftar data teman',
-            'data' => $groups
-        ],200);
-    }
+        $groups = Groups::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar data grup',
+            'data'    => $groups
+        ], 200);
     }
 
     /**
@@ -42,27 +34,29 @@ class GroupsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:groups|max:255',
+            'name' => 'required|unique:friends|max:255',
             'description' => 'required',
         ]);
+
         $groups = Groups::create([
-            'nama' => $request ->name,
-            'description' => $request ->description
+            'name' => $request->name,
+            'description' => $request->description
+            
         ]);
 
         if($groups)
         {
             return response()->json([
-            'success' =>true,
-            'message' =>'Teman berhasil di tambahkan',
-            'data' => $groups
-        ],200);
+                'success' => true,
+                'message' => 'Grup berhasil di tambahkan',
+                'data'    => $groups
+            ], 200);
         }else{
             return response()->json([
-                'success' =>false,
-                'message' =>'Teman gagal di tambahkan',
-                'data' => $groups
-            ],409);
+                'success' => false,
+                'message' => 'Grup gagal di tambahkan',
+                'data'    => $groups
+            ], 409);
         }
     }
 
@@ -74,24 +68,13 @@ class GroupsController extends Controller
      */
     public function show($id)
     {
-        $groups = Groups::where('id',$id)->first();
+        $group = Groups::where('id', $id)->first();
 
-        return response()->json([
-            'success' =>true,
-            'message' =>'Detail Data Teman',
-            'data' => $groups
-        ],200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-
+    return response()->json([
+        'success' => true,
+        'message' => 'Detail Data Grup',
+        'data'    => $group
+    ], 200);
     }
 
     /**
@@ -103,15 +86,17 @@ class GroupsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $groups = Groups::find($id)->update([
-            'nama' => 'required|unique:friends|max:225',
-            'description' => 'required'
+        
+        $group = Groups::find($id)
+        ->update([
+            'name' => $request->name,
+            'description' => $request->description
         ]);
 
         return response()->json([
             'success' =>true,
-            'message' =>'Data berhasil di rubah',
-            'data' => $groups
+            'message' =>'Data Group Berhasil Diubah',
+            'data' => $group
         ],200);
     }
 
@@ -124,11 +109,11 @@ class GroupsController extends Controller
     public function destroy($id)
     {
         $group = Groups::find($id)->delete();
-
         return response()->json([
-            'success' =>true,
-            'message' =>'Data teman berhasil di hapus',
-            'data' => $group
-        ],200);
+            'success' => true,
+            'message' => 'Data Berhasil Di Hapus',
+            'data'    => $group
+        ], 200);
+    
     }
 }

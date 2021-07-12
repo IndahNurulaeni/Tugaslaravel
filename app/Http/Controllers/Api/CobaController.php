@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use App\Models\Friends;
+
+Use App\Models\Friends;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -14,13 +15,13 @@ class CobaController extends Controller
      */
     public function index()
     {
-        $friends= Friends::orderBy('id', 'desc')->paginate(3);
+        $friends = Friends::with('groups')->whereHas('groups')->get();
 
         return response()->json([
-            'success' =>true,
-            'message' =>'Daftar data teman',
-            'data' => $friends
-        ],200);
+            'success' => true,
+            'message' => 'Daftar data teman',
+            'data'    => $friends
+        ], 200);
     }
 
     /**
@@ -32,30 +33,32 @@ class CobaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|unique:friends|max:225',
-            'no_tlp' =>'required|numeric',
-            'alamat' =>'required',
+            'nama' => 'required|unique:friends|max:255',
+            'no_tlp' => 'required|numeric',
+            'alamat' => 'required',
         ]);
 
         $friends = Friends::create([
-            'nama' => $request ->nama,
-            'no_tlp' => $request -> no_tlp,
-            'alamat' => $request ->alamat
+            'nama' => $request->nama,
+            'no_tlp' => $request->no_tlp,
+            'alamat' => $request->alamat,
+            'groups_id' => $request->groups_id,
+            
         ]);
 
         if($friends)
         {
             return response()->json([
-            'success' =>true,
-            'message' =>'Teman berhasil di tambahkan',
-            'data' => $friends
-        ],200);
+                'success' => true,
+                'message' => 'Teman berhasil di tambahkan',
+                'data'    => $friends
+            ], 200);
         }else{
             return response()->json([
-                'success' =>false,
-                'message' =>'Teman gagal di tambahkan',
-                'data' => $friends
-            ],409);
+                'success' => false,
+                'message' => 'Teman gagal di tambahkan',
+                'data'    => $friends
+            ], 409);
         }
 
     }
@@ -68,13 +71,23 @@ class CobaController extends Controller
      */
     public function show($id)
     {
-        $friend = Friends::where('id', $id) ->first();
+        $friend = Friends::with('groups')->where('id', $id)->get();
 
-        return response()->json([
-            'success' =>true,
-            'message' =>'Detail Data Teman',
-            'data' => $friend
-        ],200);
+    return response()->json([
+        'success' => true,
+        'message' => 'Detail Data Teman',
+        'data'    => $friend
+    ], 200);
+    }
+    public function edit($id)
+    {
+        $friend = Friends::with('groups')->where('id', $id)->first();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Detail Data Teman',
+        'data'    => $friend
+    ], 200);
     }
 
     /**
@@ -86,15 +99,16 @@ class CobaController extends Controller
      */
     public function update(Request $request, $id)
     {
-       $friend = Friends::find($id)->update([
+        $friend = Friends::find($id)
+        ->update([
             'nama' => $request->nama,
             'no_tlp' => $request->no_tlp,
-            'alamat' => $request->alamat
+            'alamat' => $request->alamat, 
+            'groups_id' => $request->groups_id, 
         ]);
-
         return response()->json([
             'success' =>true,
-            'message' =>'Data teman berhasil di rubah',
+            'message' =>'Data Teman Berhasil Diubah',
             'data' => $friend
         ],200);
     }
@@ -108,11 +122,10 @@ class CobaController extends Controller
     public function destroy($id)
     {
         $friend = Friends::find($id)->delete();
-
         return response()->json([
-            'success' =>true,
-            'message' =>'Data teman berhasil di hapus',
-            'data' => $friend
-        ],200);
+            'success' => true,
+            'message' => 'Data Berhasil Di Hapus',
+            'data'    => $friend
+        ], 200);
     }
 }
